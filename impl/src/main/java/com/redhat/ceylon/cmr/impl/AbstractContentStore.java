@@ -31,6 +31,7 @@ import java.util.Set;
  */
 public abstract class AbstractContentStore implements ContentStore, StructureBuilder {
 
+    private static final String SRC = ".src";
     private static final String CAR = ".car";
     private static final String JAR = ".jar";
     private static final String SHA1 = ".sha1";
@@ -43,6 +44,7 @@ public abstract class AbstractContentStore implements ContentStore, StructureBui
 
     protected AbstractContentStore(Logger log) {
         this.log = log;
+        addSuffix(SRC);
         addSuffix(CAR);
         addSuffix(JAR);
         addSuffix(ZIP);
