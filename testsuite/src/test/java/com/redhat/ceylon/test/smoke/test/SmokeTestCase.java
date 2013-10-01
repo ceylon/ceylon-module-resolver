@@ -37,13 +37,11 @@ import com.redhat.ceylon.cmr.api.RepositoryManagerBuilder;
 import com.redhat.ceylon.cmr.api.VersionComparator;
 import com.redhat.ceylon.cmr.impl.DefaultRepository;
 import com.redhat.ceylon.cmr.impl.JDKRepository;
-import com.redhat.ceylon.cmr.impl.MavenRepositoryHelper;
 import com.redhat.ceylon.cmr.impl.RemoteContentStore;
 import com.redhat.ceylon.cmr.impl.SimpleRepositoryManager;
 import com.redhat.ceylon.cmr.spi.OpenNode;
 import com.redhat.ceylon.test.smoke.support.InMemoryContentStore;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -208,38 +206,6 @@ public class SmokeTestCase extends AbstractTest {
             manager.removeArtifact(name, version);
             // test if remove really works
             testSearchResults("com.redhat.fizbiz", Type.JVM, new ModuleDetails[0]);
-        }
-    }
-
-    @Test
-    @Ignore // this test should work, if you have org.slf4j.slf4j-api 1.5.10 present
-    public void testMavenLocal() throws Exception {
-        RepositoryManager manager = new SimpleRepositoryManager(MavenRepositoryHelper.getMavenRepository(), log);
-        ArtifactContext ac = new ArtifactContext("org.slf4j.slf4j-api", "1.5.10");
-        File file = manager.getArtifact(ac);
-        Assert.assertNotNull(file);
-        // No remove, as we don't wanna delete from mvn manager
-    }
-
-    @Test
-    public void testMavenRemote() throws Exception {
-        RepositoryManagerBuilder builder = getRepositoryManagerBuilder(false);
-        Repository externalRepo = MavenRepositoryHelper.getMavenRepository("https://repository.jboss.org/nexus/content/groups/public", log, false);
-        builder.prependRepository(externalRepo);
-        RepositoryManager manager = builder.buildRepository();
-        ArtifactContext ac = new ArtifactContext("org.jboss.jboss-vfs", "3.0.1.GA", ArtifactContext.JAR);
-        File file = null;
-        try {
-            file = manager.getArtifact(ac);
-            Assert.assertNotNull(file);
-            Assert.assertEquals("jboss-vfs-3.0.1.GA.jar", file.getName());
-        } finally {
-            // delete the jar, not the car
-            ac.setSuffixes(ArtifactContext.JAR);
-            manager.removeArtifact(ac);
-            // temporary workaround, because the jar is not stored at the right place
-            if (file != null)
-                Assert.assertTrue(file.delete());
         }
     }
 
