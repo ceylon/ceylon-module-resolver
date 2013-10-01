@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,6 +36,7 @@ public class CeylonUtils {
         private boolean offline;
         private boolean jdkIncluded;
         private Logger log;
+        private List<RepositoryManagerListener> listeners;
 
         /**
          * Sets the current working directory to use for encountering the configuration
@@ -172,6 +174,21 @@ public class CeylonUtils {
             return this;
         }
 
+        /**
+         * Add a listener to the list of suggested listeners for this repository manager
+         * Implementations can then choose whether to add listeners to managers
+         *
+         * @param listner A RepositoryManagerListener to be added to a list
+         * @return This object for chaining method calls
+         */
+        public CeylonRepoManagerBuilder addListener(RepositoryManagerListener listener) {
+            if (this.listeners == null) {
+                this.listeners = new ArrayList<RepositoryManagerListener>();
+            }
+            this.listeners.add(listener);
+            return this;
+        }
+        
         /**
          * Creates a RepositoryManager used for doing lookups using the current state of this builder
          *
