@@ -42,6 +42,7 @@ import com.redhat.ceylon.cmr.spi.ContentStore;
 import com.redhat.ceylon.cmr.spi.Node;
 import com.redhat.ceylon.cmr.spi.OpenNode;
 import com.redhat.ceylon.common.FileUtil;
+import com.redhat.ceylon.common.config.Repositories;
 import com.redhat.ceylon.common.log.Logger;
 import com.redhat.ceylon.model.cmr.ArtifactResult;
 import com.redhat.ceylon.model.cmr.RepositoryException;
@@ -62,9 +63,20 @@ public abstract class AbstractNodeRepositoryManager extends AbstractRepositoryMa
 
     protected CmrRepository cache; // cache root
     protected boolean addCacheAsRoot; // do we treat cache as repo
+    protected Overrides distOverrides;
 
     public AbstractNodeRepositoryManager(Logger log, Overrides overrides) {
         super(log, overrides);
+        File file = new File(Repositories.get().getSystemRepoDir(), "override.xml");
+        if (file.exists()) {
+            try {
+                distOverrides = Overrides.parse(file.getAbsolutePath());
+            } catch (Exception e) {
+                throw new RuntimeException("Could not read distribution overrides: " + file.getAbsolutePath(), e);
+            }
+        } else {
+            distOverrides = null;
+        }
     }
 
     public synchronized void setAddCacheAsRoot(boolean addCacheAsRoot) {
@@ -187,13 +199,26 @@ public abstract class AbstractNodeRepositoryManager extends AbstractRepositoryMa
     }
 
     private ArtifactContext applyOverrides(ArtifactContext context) {
-        if(overrides == null)
-            return context;
-        ArtifactContext replacedContext = overrides.replace(context);
-        if(replacedContext != null)
-            context = replacedContext;
-        context.setVersion(overrides.getVersionOverride(context));
+        context = applyOverrides(distOverrides, "Override by distribution: ", context);
+        context = applyOverrides(overrides, "Override by user: ", context);
         return context;
+    }
+    
+    private ArtifactContext applyOverrides(Overrides overrides, String origin, final ArtifactContext sought) {
+        if(overrides == null)
+            return sought;
+        ArtifactContext replacedContext = overrides.replace(sought);
+        if(replacedContext == null) {
+            replacedContext = sought;
+        } else {
+            log.debug(origin + sought + " -> " + replacedContext);
+        }
+        String versionOverride = overrides.getVersionOverride(replacedContext);
+        if (!versionOverride.equals(replacedContext.getVersion())) {
+            log.debug(origin + replacedContext + " -> version " + versionOverride);
+            replacedContext.setVersion(versionOverride);
+        }
+        return replacedContext;
     }
 
     private ArtifactResult handleNotFound(ArtifactContext context, String foundSuffix) {
