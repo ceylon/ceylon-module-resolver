@@ -204,6 +204,11 @@ public abstract class AbstractNodeRepositoryManager extends AbstractRepositoryMa
         return context;
     }
     
+    @Override
+    public ArtifactContext getArtifactOverride(ArtifactContext context) throws RepositoryException {
+        return applyOverrides(context);
+    }
+    
     private ArtifactContext applyOverrides(Overrides overrides, final ArtifactContext sought) {
         if(overrides == null)
             return sought;
