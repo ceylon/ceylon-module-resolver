@@ -67,7 +67,7 @@ public abstract class AbstractNodeRepositoryManager extends AbstractRepositoryMa
 
     public AbstractNodeRepositoryManager(Logger log, Overrides overrides) {
         super(log, overrides);
-        File file = new File(Repositories.get().getSystemRepoDir(), "override.xml");
+        File file = new File(Repositories.get().getSystemRepoDir(), "dist-overrides.xml");
         if (file.exists()) {
             try {
                 distOverrides = Overrides.parse(file.getAbsolutePath());
