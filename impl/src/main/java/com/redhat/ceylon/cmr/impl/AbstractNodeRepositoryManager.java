@@ -199,23 +199,23 @@ public abstract class AbstractNodeRepositoryManager extends AbstractRepositoryMa
     }
 
     private ArtifactContext applyOverrides(ArtifactContext context) {
-        context = applyOverrides(distOverrides, "Override by distribution: ", context);
-        context = applyOverrides(overrides, "Override by user: ", context);
+        context = applyOverrides(distOverrides, context);
+        context = applyOverrides(overrides, context);
         return context;
     }
     
-    private ArtifactContext applyOverrides(Overrides overrides, String origin, final ArtifactContext sought) {
+    private ArtifactContext applyOverrides(Overrides overrides, final ArtifactContext sought) {
         if(overrides == null)
             return sought;
         ArtifactContext replacedContext = overrides.replace(sought);
         if(replacedContext == null) {
             replacedContext = sought;
         } else {
-            log.debug(origin + sought + " -> " + replacedContext);
+            log.debug(overrides + ": " + sought + " -> " + replacedContext);
         }
         String versionOverride = overrides.getVersionOverride(replacedContext);
         if (!versionOverride.equals(replacedContext.getVersion())) {
-            log.debug(origin + replacedContext + " -> version " + versionOverride);
+            log.debug(overrides + ": " + replacedContext + " -> version " + versionOverride);
             replacedContext.setVersion(versionOverride);
         }
         return replacedContext;
