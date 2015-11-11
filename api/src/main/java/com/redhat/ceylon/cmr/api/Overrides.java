@@ -77,6 +77,12 @@ public class Overrides {
 
     private Map<String, String> setVersions = new HashMap<>();
 
+    private String source = null;
+    
+    public String toString() {
+        return this.source == null ? super.toString() : "Overrides("+source+")";
+    }
+    
     public void addArtifactOverride(ArtifactOverrides ao) {
         overrides.put(ao.getOwner(), ao);
         if(ao.getOwner().getVersion() == null)
@@ -213,7 +219,9 @@ public class Overrides {
             throw new IllegalArgumentException("No such overrides file: " + overridesFile);
         }
         try(InputStream is = new FileInputStream(overridesFile)){
-            return Overrides.parse(is);
+            Overrides overrides = Overrides.parse(is);
+            overrides.source = overridesFile.getAbsolutePath();
+            return overrides;
         }
     }
     
