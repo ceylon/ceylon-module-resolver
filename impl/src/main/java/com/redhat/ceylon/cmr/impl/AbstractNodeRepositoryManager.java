@@ -67,15 +67,10 @@ public abstract class AbstractNodeRepositoryManager extends AbstractRepositoryMa
 
     public AbstractNodeRepositoryManager(Logger log, Overrides overrides) {
         super(log, overrides);
-        File file = new File(Repositories.get().getSystemRepoDir(), "dist-overrides.xml");
-        if (file.exists()) {
-            try {
-                distOverrides = Overrides.parse(file.getAbsolutePath());
-            } catch (Exception e) {
-                throw new RuntimeException("Could not read distribution overrides: " + file.getAbsolutePath(), e);
-            }
-        } else {
-            distOverrides = null;
+        try {
+            distOverrides = Overrides.parseDistOverrides();
+        } catch (Exception e) {
+            throw new RuntimeException("Could not read distribution overrides", e);
         }
     }
 

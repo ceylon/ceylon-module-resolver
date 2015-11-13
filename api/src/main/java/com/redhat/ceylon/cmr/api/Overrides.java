@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -221,6 +222,15 @@ public class Overrides {
         try(InputStream is = new FileInputStream(overridesFile)){
             Overrides overrides = Overrides.parse(is);
             overrides.source = overridesFile.getAbsolutePath();
+            return overrides;
+        }
+    }
+    
+    public static Overrides parseDistOverrides() throws FileNotFoundException, Exception{
+        URL resource = Overrides.class.getResource("/com/redhat/ceylon/cmr/api/dist-overrides.xml");
+        try(InputStream is = resource.openStream()){
+            Overrides overrides = Overrides.parse(is);
+            overrides.source = resource.toString();
             return overrides;
         }
     }
