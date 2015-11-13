@@ -214,7 +214,8 @@ public abstract class AbstractNodeRepositoryManager extends AbstractRepositoryMa
             log.debug(overrides + ": " + sought + " -> " + replacedContext);
         }
         String versionOverride = overrides.getVersionOverride(replacedContext);
-        if (!versionOverride.equals(replacedContext.getVersion())) {
+        if (versionOverride != null // only possible to default module, and we can't override that 
+                && !versionOverride.equals(replacedContext.getVersion())) {
             log.debug(overrides + ": " + replacedContext + " -> version " + versionOverride);
             replacedContext.setVersion(versionOverride);
         }
